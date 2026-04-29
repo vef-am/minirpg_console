@@ -1,0 +1,8 @@
+# Ignore executables
+*.o
+*.exe
+*.out
+
+
+# Ignore this folder
+/my-checklist-guide
