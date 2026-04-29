@@ -1,13 +1,18 @@
 CPP = g++
-OPTIONS = -D_JUDGE_ -D_GLIBCXX_DEBUG -O2 -Wall -Wextra -Werror -Wno-sign-compare -std=c++13
+OPTIONS = -D_JUDGE_ -D_GLIBCXX_DEBUG -O2 -Wall -Wextra -Wno-sign-compare -std=c++17
 
+SRCS = $(wildcard src/*.cpp)
+OBJS = $(SRCS:.cpp=.o)
+TARGET = bin/minirpg_console
 
-main.exe: main.o
-	$(CPP) -o main.exe main.o
+all: $(TARGET)
 
-main.o: main.cc
-	$(CPP) -c main.cc $(OPTIONS)
+$(TARGET): $(OBJS)
+	@mkdir -p $(dir $@)
+	$(CPP) $(OBJS) -o $(TARGET) $(OPTIONS)
+
+%.o: %.cpp
+	$(CPP) -c $< $(OPTIONS) -o $@
 
 clean:
-	rm *.o
-	rm *.exe
+	rm -f src/*.o $(TARGET)
