@@ -18,7 +18,7 @@ private:
     int maxHp;
 
     /** @brief Character's armor */
-    float armor;
+    int armor;
 
 public:
     // Constructors
@@ -33,7 +33,7 @@ public:
      * \pre <em>true</em>
      * \post The result is a Character.
      */
-    Character(const std::string &name = "", int health = 0, float armor = 0.0f);
+    Character(const std::string &name = "", int health = 0, int armor = 0);
 
     // Destructors
 
