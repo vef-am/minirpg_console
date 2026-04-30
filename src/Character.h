@@ -2,13 +2,12 @@
 #define CHARACTER_H
 
 #ifndef NO_DIAGRAM
-#include <iostream>
 #include <string>
 #endif
 
-class Character {
-    private:
-
+class Character
+{
+private:
     /** @brief Character's name */
     std::string name;
 
@@ -21,6 +20,24 @@ class Character {
     /** @brief Character's armor */
     float armor;
 
+public:
+    // Constructors
+
+    /** @brief Constructor by default.
+     * \pre <em>true</em>
+     * \post The result is a empty Character.
+     */
+    Character();
+
+    /** @brief Constructor.
+     * \pre <em>true</em>
+     * \post The result is a Character.
+     */
+    Character(const std::string &name = "", int health = 0, float armor = 0.0f);
+
+    // Destructors
+
+    virtual ~Character() noexcept = default;
 };
 
 #endif
