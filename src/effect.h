@@ -72,6 +72,32 @@ public:
      * \post The result is the Effect's damage per turn.
      */
     int getDamagePerTurn() const;
+
+    // Methods
+
+    /** @brief Reduces duration by 1.
+     * \pre duration > 0
+     * \post The Effect's duration is reduced by 1.
+     */
+    void tick();
+
+    /** @brief Tells if the Effect is expired or not.
+     * \pre <em>true</em>
+     * \post The result is true for expired, false for not.
+     */
+    bool isExpired() const;
+
+    /** @brief Resets the effect in case of reapplied.
+     * \pre <em>true</em>
+     * \post The result is a reseted Effect.
+     */
+    void reset();
+
+    /** @brief Updates duration.
+     * \pre A duration d > 0.
+     * \post The result is an Effect with an updated duration.
+     */
+    void setDuration(int d);
 };
 
 #endif

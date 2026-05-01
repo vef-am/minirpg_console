@@ -37,3 +37,23 @@ int Effect::getDamagePerTurn() const
 {
     return damagePerTurn;
 }
+
+// Methods
+
+void Effect::tick(){
+    duration -= 1;
+}
+
+bool Effect::isExpired() const{
+    if(duration == 0) return true;
+    return false;
+}
+
+void Effect::reset(){
+    duration = maxDuration;
+}
+
+void Effect::setDuration(int d){
+    duration = d;
+    maxDuration = d;
+}
