@@ -1,5 +1,7 @@
 #include "effect.h"
 
+static std::mt19937 gen(std::random_device());
+
 // Constructors
 
 Effect::Effect(const std::string &type, int duration, int potency, bool isNegative, int damagePerTurn) : type(type), duration(duration), maxDuration(duration), potency(potency), isNegative(isNegative), damagePerTurn(damagePerTurn)
@@ -40,20 +42,39 @@ int Effect::getDamagePerTurn() const
 
 // Methods
 
-void Effect::tick(){
+void Effect::tick()
+{
     duration -= 1;
 }
 
-bool Effect::isExpired() const{
-    if(duration == 0) return true;
+bool Effect::isExpired() const
+{
+    if (duration == 0)
+        return true;
     return false;
 }
 
-void Effect::reset(){
+void Effect::reset()
+{
     duration = maxDuration;
 }
 
-void Effect::setDuration(int d){
+void Effect::setDuration(int d)
+{
     duration = d;
     maxDuration = d;
+}
+
+bool Effect::tryRemoveEarly(int constitution) const
+{
+    if (isNegative)
+    {
+        float probabilty = (constitution / 100.0) * ((maxDuration - duration) / maxDuration);
+
+        std::uniform_real_distribution<float> dist(0.0, 1.0);
+
+        if (dist(gen) <= probabilty)
+            return true;
+    }
+    return false;
 }

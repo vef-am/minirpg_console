@@ -3,6 +3,7 @@
 
 #ifndef NO_DIAGRAM
 #include <string>
+#include <random>
 #endif
 
 class Effect
@@ -14,7 +15,7 @@ private:
     /** @brief Effect's actual duration */
     int duration;
 
-    /** @brief Effect's maximun duration */
+    /** @brief Effect's maximum duration */
     int maxDuration;
 
     /** @brief Effect's potency */
@@ -49,9 +50,9 @@ public:
      */
     int getDuration() const;
 
-    /** @brief Gets the Effect's maximun duration.
+    /** @brief Gets the Effect's maximum duration.
      * \pre <em>true</em>
-     * \post The result is the Effect's maximun duration.
+     * \post The result is the Effect's maximum duration.
      */
     int getMaxDuration() const;
 
@@ -93,11 +94,17 @@ public:
      */
     void reset();
 
-    /** @brief Updates duration.
+    /** @brief Resets the effect in case of reapplied with a longer effect duration and updates its duration.
      * \pre A duration d > 0.
      * \post The result is an Effect with an updated duration.
      */
     void setDuration(int d);
+
+    /** @brief Remove a negative Effect before its duration.
+     * \pre A constitution => 0 && constitution <= 100.
+     * \post True for remove, false for not.
+     */
+    bool tryRemoveEarly(int constitution) const;
 };
 
 #endif
