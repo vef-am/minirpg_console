@@ -69,30 +69,51 @@ Core of shared combat mechanics between Player and Enemy.
 
 ---
 
-## 2. Effect.h - Effect Structure
+## 2. Effect.h/cpp - Effect Structure
 
 ### Responsibility
-Represent an active effect with its type, duration, potency and associated immunities.
+Represent an active effect with its type, duration, potency and intensity. Effects are mutable and live inside a `Character`'s collection; when the same effect type is reapplied with longer duration, it replaces the existing one.
 
-### Attributes
-- `std::string type` - effect type (Poison, Stun, Buff, etc.)
+### Required Attributes
+- `std::string type` - effect identifier (Poison, Stun, DefenseBuff, etc.)
 - `int duration` - remaining turns
-- `int potency` - effect intensity
-- `bool isNegative` - flag to differentiate negative from positive
-- `int damagePerTurn` - damage applied this turn (only if negative)
-- `std::vector<std::string> immuneCharacters` - characters that can be immune to this type
+- `int maxDuration` - original duration at application (used for probability calculations and resets)
+- `int potency` - effect intensity (damage per turn, buff amount, etc.)
+- `bool isNegative` - true if effect is harmful
+- `int damagePerTurn` - damage applied each turn (only for damage-over-time effects)
 
-### Methods
-- Constructor
+### Required Methods
+
+#### Getters
+- `getType() const` - returns effect type
+- `getDuration() const` - returns remaining turns
+- `getMaxDuration() const` - returns original duration
+- `getPotency() const` - returns intensity value
+- `getIsNegative() const` - returns whether effect is harmful
+- `getDamagePerTurn() const` - returns damage per turn
+
+#### Lifecycle methods
+- Constructor: `Effect(const std::string &type, int duration, int potency, bool isNegative, int damagePerTurn)`
 - `tick()` - reduces duration by 1
-- `isExpired()` - returns true if duration <= 0
-- `canBeRemovedEarly(int constitutionOfTarget)` - calculates early removal probability
+- `isExpired() const` - returns true if duration <= 0
+- `reset()` - sets duration back to maxDuration (used when reapplying effect)
+- `setDuration(int d)` - updates duration (useful when comparing durations on reapplication)
 
-### Considerations
-- Early removal depends on:
-  - Target's constitution (high constitution = higher probability)
-  - Remaining duration (fewer turns = higher probability)
-- Formula: `prob = (resistance / 100) * ((max_duration - remaining_turns) / max_duration)`
+#### Effect evaluation
+- `tryRemoveEarly(int constitution) const` - calculates early removal probability based on:
+  - Target's constitution (0..100): higher constitution = higher removal probability
+  - Remaining duration: fewer turns remaining = higher removal probability
+  - Formula: `probability = (constitution / 100.0) * ((maxDuration - duration) / maxDuration)`
+  - Should return true if effect should be removed this turn
+
+### Design Considerations
+- Effects are mutable and stored in `std::vector<Effect>` within Character
+- When an effect type is reapplied:
+  - If new duration > existing duration: replace existing effect with new one
+  - If new duration <= existing duration: keep existing effect unchanged
+  - Example: Poison(5 turns) replaces Poison(2 turns), but Poison(2 turns) does not replace Poison(5 turns)
+- Early removal is probabilistic and only applies to negative effects
+- The `maxDuration` field allows consistent probability calculations even after duration has been reduced by ticks
 
 ---
 
