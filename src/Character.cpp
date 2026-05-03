@@ -6,58 +6,119 @@
 
 // Constructors
 
-Character::Character() : name(""), health(-1), maxHp(-1), armor(0)
+Character::Character(const std::string &name, const Attributes &attributes, int currentHp, int maxHp, int armor, int currentSp, int maxSp) : name(name), currentHp(currentHp), maxHp(maxHp), armor(armor), currentSp(currentSp), maxSp(maxSp), attributes(attributes), defenseBoost(0)
 {
-}
+    if (this->maxHp < 0)
+        throw std::invalid_argument("Error! The maximum health must be a non-negative number.");
+    else if (this->maxHp == 0)
+        this->maxHp = this->currentHp;
 
-Character::Character(const std::string &name, int health, int armor) : name(name), health(health), maxHp(health), armor(armor)
-{
-    if (maxHp < 0)
-        maxHp = 0;
+    if (this->currentHp < 0)
+        throw std::invalid_argument("Error! The current health must be a non-negative number.");
+    else if (this->currentHp > this->maxHp)
+        this->currentHp = this->maxHp;
 
-    if (health < 0)
-        health = 0;
-    else if (health > maxHp)
-        health = maxHp;
+    if (this->maxSp < 0)
+        throw std::invalid_argument("Error! The maximum skill points must be a non-negative number.");
+    else if (this->maxSp == 0)
+        this->maxSp = this->currentSp;
 
-    if (armor < 0)
-        armor = 0;
+    if (this->currentSp < 0)
+        throw std::invalid_argument("Error! The current skill points must be a non-negative number.");
+    else if (this->currentSp > this->maxSp)
+        this->currentSp = this->maxSp;
+
+    if (this->armor < 0)
+        this->armor = 0;
 }
 
 // Getters
 
 std::string Character::getName() const
 {
-    return this->name;
+    return name;
 }
 
-int Character::getHealth() const
+int Character::getCurrentHp() const
 {
-    return this->health;
+    return currentHp;
 }
 
 int Character::getMaxHp() const
 {
-    return this->maxHp;
+    return maxHp;
 }
 
 int Character::getArmor() const
 {
-    return this->armor;
+    return armor;
+}
+
+int Character::getCurrentSp() const
+{
+    return currentSp;
+}
+
+int Character::getMaxSp() const
+{
+    return maxSp;
+}
+
+int Character::getStrength() const
+{
+    return attributes.strength;
+}
+
+int Character::getAgility() const
+{
+    return attributes.agility;
+}
+
+int Character::getConstitution() const
+{
+    return attributes.constitution;
+}
+
+int Character::getIntelligence() const
+{
+    return attributes.intelligence;
+}
+
+int Character::getWisdom() const
+{
+    return attributes.wisdom;
+}
+
+int Character::getCharisma() const
+{
+    return attributes.charisma;
+}
+
+const std::vector<Effect>& Character::getEffects() const
+{
+    return effects;
+}
+
+bool Character::isAlive() const
+{
+    return currentHp > 0;
 }
 
 // Setters
 
-int Character::setHealth(int health)
+void Character::setHealth(int health)
 {
-    if(health < 0) health = 0;
-    else if(health > maxHp) health = maxHp;
+    if (health < 0)
+        health = 0;
+    else if (health > maxHp)
+        health = maxHp;
 
-    this->health = health;
+    currentHp = health;
 }
 
-int Character::setArmor(int armor)
+void Character::setArmor(int armor)
 {
+    this->armor = (armor < 0) ? 0 : armor;
 }
 
 // Modifiers
@@ -66,9 +127,7 @@ int Character::setArmor(int armor)
 
 bool Character::isDead() const
 {
-    if (this->health == 0)
-        return true;
-    return false;
+    return currentHp <= 0;
 }
 
 // Destructors
