@@ -1,6 +1,6 @@
 #include "effect.h"
 
-static std::mt19937 gen(std::random_device());
+static std::mt19937 gen(std::random_device{}());
 
 // Constructors
 
@@ -69,11 +69,14 @@ bool Effect::tryRemoveEarly(int constitution) const
 {
     if (isNegative)
     {
-        float probabilty = (constitution / 100.0) * ((maxDuration - duration) / maxDuration);
+        if (maxDuration <= 0)
+            return false;
+
+        float probability = (constitution / 100.0f) * ((maxDuration - duration) / static_cast<float>(maxDuration));
 
         std::uniform_real_distribution<float> dist(0.0, 1.0);
 
-        if (dist(gen) <= probabilty)
+        if (dist(gen) <= probability)
             return true;
     }
     return false;
