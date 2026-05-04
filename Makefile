@@ -10,9 +10,13 @@ TEST_EFFECT_SRCS = tests/test_effect.cpp src/effect.cpp
 TEST_CHARACTER_TARGET = bin/test_character
 TEST_CHARACTER_SRCS = tests/test_character.cpp src/character.cpp src/effect.cpp
 
-.PHONY: all test-effect run-test-effect test-character run-test-character clean
+.PHONY: all test test-effect run-test-effect test-character run-test-character clean
 
 all: $(TARGET)
+
+test: $(TEST_EFFECT_TARGET) $(TEST_CHARACTER_TARGET)
+	$(TEST_EFFECT_TARGET)
+	$(TEST_CHARACTER_TARGET)
 
 test-effect: $(TEST_EFFECT_TARGET)
 
@@ -40,6 +44,6 @@ src/%.o: src/%.cpp
 	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 clean:
-	rm -f src/*.o $(DEPS) $(TARGET) $(TEST_EFFECT_TARGET)
+	rm -f src/*.o $(DEPS) $(TARGET) $(TEST_EFFECT_TARGET) $(TEST_CHARACTER_TARGET)
 
 -include $(DEPS)
