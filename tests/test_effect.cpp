@@ -16,6 +16,8 @@ namespace
         assert(poison.getIsNegative());
         assert(poison.getDamagePerTurn() == 3);
         assert(!poison.isExpired());
+
+        std::cout << "  creation_and_getters ok\n";
     }
 
     void test_tick_and_expiration()
@@ -37,6 +39,8 @@ namespace
         poison.tick();
         assert(poison.getDuration() == 0);
         assert(poison.isExpired());
+
+        std::cout << "  tick_and_expiration ok\n";
     }
 
     void test_reset_and_set_duration()
@@ -59,6 +63,8 @@ namespace
         assert(poison.getDuration() == 5);
         poison.reset();
         assert(poison.getDuration() == 6);
+
+        std::cout << "  reset_and_set_duration ok\n";
     }
 
     void test_positive_effect_never_removes_early()
@@ -69,6 +75,8 @@ namespace
         {
             assert(!blessing.tryRemoveEarly(constitution));
         }
+
+        std::cout << "  positive_effect_never_removes_early ok\n";
     }
 
     void test_negative_effect_removal_trend_by_constitution()
@@ -96,6 +104,8 @@ namespace
 
         assert(lowRemovedCount <= highRemovedCount);
         assert(highRemovedCount > 0);
+
+        std::cout << "  negative_effect_removal_trend_by_constitution ok\n";
     }
 
     void test_negative_effect_removal_trend_by_duration()
@@ -125,6 +135,8 @@ namespace
 
         assert(earlyRemovedCount <= lateRemovedCount);
         assert(lateRemovedCount > 0);
+
+        std::cout << "  negative_effect_removal_trend_by_duration ok\n";
     }
 
     void test_expiration_after_last_tick()
@@ -135,6 +147,8 @@ namespace
         poison.tick();
         assert(poison.getDuration() == 0);
         assert(poison.isExpired());
+
+        std::cout << "  expiration_after_last_tick ok\n";
     }
 } // namespace
 

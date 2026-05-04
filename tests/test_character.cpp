@@ -32,6 +32,8 @@ namespace
         assert(hero.getCharisma() == 22);
         assert(hero.isAlive());
         assert(!hero.isDead());
+
+        std::cout << "  constructor_and_getters ok\n";
     }
 
     void test_constructor_invariants()
@@ -48,6 +50,8 @@ namespace
         assert(fallback.getCurrentHp() == 45);
         assert(fallback.getMaxSp() == 15);
         assert(fallback.getCurrentSp() == 15);
+
+        std::cout << "  constructor_invariants ok\n";
     }
 
     void test_health_and_armor_setters()
@@ -68,6 +72,8 @@ namespace
 
         hero.setArmor(11);
         assert(hero.getArmor() == 11);
+
+        std::cout << "  health_and_armor_setters ok\n";
     }
 
     void test_skill_points_api()
@@ -91,6 +97,8 @@ namespace
 
         hero.consumeSp(-2);
         assert(hero.getCurrentSp() == 13);
+
+        std::cout << "  skill_points_api ok\n";
     }
 
     void test_damage_heal_and_defense()
@@ -116,6 +124,8 @@ namespace
         defender.reduceCooldowns();
         defender.takeDamage(30);
         assert(defender.getCurrentHp() == 64);
+
+        std::cout << "  damage_heal_and_defense ok\n";
     }
 
     void test_effect_lifecycle_and_reapplication()
@@ -157,6 +167,8 @@ namespace
         Effect blessing("Blessing", 2, 1, false, 0);
         hero.addEffect(blessing);
         assert(hero.getEffects().size() == 2);
+
+        std::cout << "  effect_lifecycle_and_reapplication ok\n";
     }
 
     void test_process_effects()
@@ -173,6 +185,8 @@ namespace
         hero.processEffects();
         assert(hero.getCurrentHp() == 40);
         assert(hero.getEffects().empty());
+
+        std::cout << "  process_effects ok\n";
     }
 
     void test_cooldowns_and_immunity()
@@ -198,6 +212,8 @@ namespace
         hero.removeImmunity(immunities);
         assert(!hero.isImmune("Sleep"));
         assert(!hero.isImmune("Stun"));
+
+        std::cout << "  cooldowns_and_immunity ok\n";
     }
 } // namespace
 
