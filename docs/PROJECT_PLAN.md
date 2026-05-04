@@ -54,6 +54,7 @@ Playable console version with:
 - Duration is tracked by turns
 - Poison damage is applied per turn
 - A character can have multiple active effects simultaneously
+- Reapplying the same effect type only refreshes it when the new maximum duration is equal to or greater than the existing one; equal maximum duration resets the active instance
 - Early poison removal:
   - Probability based on resistance/constitution
   - Fewer turns remaining increases probability of removal
@@ -244,3 +245,8 @@ This version closes all rules and parameters for implementation.
 
 All major design decisions are documented in this plan.
 For implementation details, see IMPLEMENTATION_PLAN.md
+
+### 2026-05-04
+- Confirmed `Attributes` is a standalone struct shared by Character, Player and Enemy
+- Confirmed same-type effect reapplication resets the active effect when the incoming maximum duration matches the existing one
+- Confirmed `display()` is a console-only presentation method and not part of combat rules

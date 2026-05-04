@@ -2,10 +2,12 @@
 #define CHARACTER_H
 
 #ifndef NO_DIAGRAM
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #endif
 
 #include "effect.h"
@@ -46,6 +48,8 @@ private:
     /** @brief Character base attributes */
     Attributes attributes;
 
+    std::set<std::string> immunity;
+
     // Temporary (combat state)
 
     std::vector<Effect> effects;
@@ -61,7 +65,7 @@ public:
      * \pre <em>true</em>
      * \post The result is a Character.
      */
-    Character(const std::string &name, const Attributes &attributes = Attributes(), int currentHp = 0, int maxHp = 0, int armor = 0, int currentSp = 0, int maxSp = 0);
+    Character(const std::string &name, const Attributes &attributes = Attributes(), int currentHp = 50, int maxHp = 0, int armor = 10, int currentSp = 50, int maxSp = 0);
 
     // Getters
 
@@ -101,20 +105,52 @@ public:
      */
     int getMaxSp() const;
 
+    /** @brief Gets the Character's strength.
+     * \pre <em>true</em>
+     * \post The result is the Character's strength.
+     */
     int getStrength() const;
 
+    /** @brief Gets the Character's agility.
+     * \pre <em>true</em>
+     * \post The result is the Character's agility.
+     */
     int getAgility() const;
 
+    /** @brief Gets the Character's constitution.
+     * \pre <em>true</em>
+     * \post The result is the Character's constitution.
+     */
     int getConstitution() const;
 
+    /** @brief Gets the Character's intelligence.
+     * \pre <em>true</em>
+     * \post The result is the Character's intelligence.
+     */
     int getIntelligence() const;
 
+    /** @brief Gets the Character's wisdom.
+     * \pre <em>true</em>
+     * \post The result is the Character's wisdom.
+     */
     int getWisdom() const;
 
+    /** @brief Gets the Character's charisma.
+     * \pre <em>true</em>
+     * \post The result is the Character's charisma.
+     */
     int getCharisma() const;
 
+    /** @brief Gets the Character's effects.
+     * \pre <em>true</em>
+     * \post The result is the Character's effects.
+     */
     const std::vector<Effect> &getEffects() const;
 
+    /** @brief Tells if the Character is alive.
+     * \pre <em>true</em>
+     * \post The result is if the Character is alive or not.
+     */
     bool isAlive() const;
 
     // Setters
@@ -131,15 +167,35 @@ public:
      */
     void setArmor(int armor);
 
-    // Modifiers
+    void addSp(int skillPoints);
 
-    /** @brief Sets Character's armor
-     * \pre An integer
-     * \post The result is a Character with a armor.
-     */
-    int takeDamage(int damage);
+    void consumeSp(int skillPoints);
 
-    int heal(int amount);
+    void addImmunity(const std::string& effectType);
+
+    void addImmunity(const std::set<std::string> &effectsType);
+
+    void removeImmunity(const std::string& effectType);
+
+    void removeImmunity(const std::set<std::string> &effectsType);
+
+    // Combat Logic
+
+    void takeDamage(int damage);
+
+    void heal(int amount);
+
+    void applyDefense();
+
+    void addEffect(const Effect &e);
+
+    void processEffects();
+
+    bool attemptRemoveEffect(const Effect &e);
+
+    void setCooldown(const std::string &skillName, int duration);
+
+    void reduceCooldowns();
 
     // Accessors
 
@@ -148,6 +204,12 @@ public:
      * \post The result is if the Character is dead or not.
      */
     bool isDead() const;
+
+    bool hasEnoughSp(int sp) const;
+
+    bool canUseSkill(const std::string &skillName) const;
+
+    bool isImmune(const std::string& effectType) const;
 
     // Output methods
 

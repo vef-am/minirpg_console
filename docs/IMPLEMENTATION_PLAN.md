@@ -31,6 +31,7 @@ Core of shared combat mechanics between Player and Enemy.
 - `std::vector<Effect> effects` - list of active effects
 - `std::map<std::string, int> cooldowns` - cooldowns by skill name
 - `int defenseBoost` - +40% temporary defense (duration: 1 turn)
+- `std::set<std::string> immunity` - effect types the character cannot receive
 
 ### Required Methods
 
@@ -43,7 +44,9 @@ Core of shared combat mechanics between Player and Enemy.
 #### Setters
 - `setHealth(int)` - updates currentHp respecting [0..maxHp]
 - `setArmor(int)`
-- `addSkillPoints(int)` / `consumeSkillPoints(int)` - skill point management
+- `addSp(int)` / `consumeSp(int)` - skill point management
+- `addImmunity(const std::string&)`, `addImmunity(const std::set<std::string>&)`
+- `removeImmunity(const std::string&)`, `removeImmunity(const std::set<std::string>&)`
 
 #### Combat Logic
 - `takeDamage(int damage)` - applies armor mitigation and defenseBoost formula
@@ -59,13 +62,66 @@ Core of shared combat mechanics between Player and Enemy.
 - `isDead()` - returns true if currentHp <= 0
 
 #### Utility
-- `display()` - shows name, HP, armor (and more if needed)
+- `display()` - console-only presentation of HP, SP, armor, attributes, effects and cooldowns
 
 ### Design Considerations
 - `takeDamage()` must apply formula: `final_damage = (damage * attacker_strength_factor) - (armor * defense_factor)`
 - Armor cannot reduce damage to negative
 - `applyDefense()` only modifies defenseBoost for 1 turn (resets at turn end)
 - Effects must be stackable (multiple can coexist)
+- Reapplying an effect of the same type only refreshes/reset the active instance when the incoming maximum duration is equal to or greater than the one already stored; otherwise, keep the existing effect unchanged
+
+### 1.1 Implementation notes for developer (Character behavior)
+
+Purpose: `Character` is the shared combat core. Implement it first as a clean, stable base before adding `Player` and `Enemy`.
+
+Recommended implementation order:
+
+1. Constructor and invariants
+  - Decide what the default constructor means for an "empty" character.
+  - Ensure `maxHp`, `health`, and `armor` stay in valid ranges.
+  - If `health > maxHp`, clamp it.
+  - If `health < 0` or `armor < 0`, clamp them to 0.
+
+2. Basic getters
+  - Implement and verify name, health, maxHp, and armor first.
+  - These are the easiest checks and help confirm the constructor is correct.
+
+3. Setters and core state mutators
+  - Define clear semantics for `setHealth(int)` and `setArmor(int)`.
+  - If you keep their current `int` return type, return the final stored value so the caller can see the clamped result.
+  - If you later prefer a `void` API, change the header and cpp together consistently.
+
+4. Damage and healing rules
+  - `takeDamage(int)` should be the main place where armor and temporary defense are applied.
+  - `heal(int)` should never raise health above maxHp.
+  - Keep both methods focused on one responsibility.
+
+5. Death checks and display
+  - `isDead()` should only depend on current health.
+  - `display()` should be presentation only; avoid combat logic there.
+
+6. Effects and cooldowns later
+  - Do not mix effect lifecycle or cooldown logic into the first pass unless the data structures are already in place.
+  - Add them after the base health/armor behavior is stable.
+
+Suggested test checklist for Character:
+
+- Constructor initializes values within bounds.
+- `setHealth()` clamps below 0 and above maxHp.
+- `setArmor()` clamps below 0.
+- `takeDamage()` reduces health correctly.
+- `takeDamage()` never drops health below 0.
+- `heal()` restores health correctly.
+- `heal()` never exceeds maxHp.
+- `isDead()` returns true only at 0 HP.
+- `display()` is optional for automated tests; manual inspection is enough.
+
+Current codebase notes:
+- `src/character.cpp` currently has the base HP/SP, damage, effects, cooldown and immunity APIs in place.
+- `display()` is presentation-only and should stay free of combat rules.
+- Keep constructor logic and setter logic aligned; otherwise the class will validate values in one place but not the other.
+- Keep effect reapplication aligned with the max-duration rule above.
 
 ---
 
@@ -114,6 +170,38 @@ Represent an active effect with its type, duration, potency and intensity. Effec
   - Example: Poison(5 turns) replaces Poison(2 turns), but Poison(2 turns) does not replace Poison(5 turns)
 - Early removal is probabilistic and only applies to negative effects
 - The `maxDuration` field allows consistent probability calculations even after duration has been reduced by ticks
+
+### 2.2 Testing suggestions for Effect (write in tests/test_effect.cpp)
+
+**Basic lifecycle tests:**
+1. Effect creation: verify all fields are initialized correctly (type, duration, maxDuration, potency, isNegative, damagePerTurn)
+2. Getters: all getters return correct values
+3. tick() behavior: duration decreases by 1 each call, and isExpired() transitions correctly
+
+**Duration management tests:**
+4. isExpired() returns false while duration > 0, true when duration == 0
+5. reset() restores duration to maxDuration
+6. setDuration(d) updates both duration and maxDuration to d (reapplication scenario)
+
+**Early removal tests:** 
+7. Positive effects (isNegative=false) never trigger early removal, always return false
+8. Negative effects (isNegative=true) with constitution=0 should never remove (probability=0)
+9. Negative effects with high constitution (80-100) and duration close to expiry (duration near 0) should have high removal probability
+   - Hint: You need to tick() the effect first so (maxDuration - duration) > 0
+10. Probability calculation: lower constitution = lower removal chance; this is probabilistic so test with multiple calls
+
+**Edge case tests:**
+11. Effect with duration=1: tick once and verify it expires
+12. Effect with maxDuration=1: verify probability formula doesn't divide by zero (should be 0 since maxDuration-duration always 0)
+13. Reapplication scenario: Apply Poison(2), tick once (duration=1), then reapply with Poison(5). Verify new duration is 5 and maxDuration is 5.
+
+**Compilation:** 
+```bash
+g++ -std=c++17 src/effect.cpp tests/test_effect.cpp -o tests/test_effect
+./tests/test_effect
+```
+
+All tests should pass and exit with code 0.
 
 ---
 

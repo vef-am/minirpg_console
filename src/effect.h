@@ -34,7 +34,7 @@ public:
      * \pre <em>true</em>
      * \post The result is an Effect.
      */
-    Effect(const std::string &type, int duration, int potency, bool isNegative, int damagePerTurn);
+    Effect(const std::string &type, int duration, int potency, bool isNegative, int damagePerTurn = 0);
 
     // Getters
 
