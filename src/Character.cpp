@@ -150,7 +150,10 @@ void Character::removeImmunity(const std::string &effectType)
 
 void Character::removeImmunity(const std::set<std::string> &effectsType)
 {
-    immunity.erase(effectsType.begin(), effectsType.end());
+    for (const auto &effectType : effectsType)
+    {
+        immunity.erase(effectType);
+    }
 }
 
 // Combat Logic
@@ -190,7 +193,7 @@ void Character::addEffect(const Effect &e)
             int newDuration = e.getMaxDuration();
             if (effects[i].getMaxDuration() < newDuration)
             {
-                effects[i].setDuration(newDuration);
+                effects[i] = e;
             }
             else if (effects[i].getMaxDuration() == newDuration)
                 effects[i].reset();
@@ -204,6 +207,7 @@ void Character::processEffects()
 {
     for (auto it = effects.begin(); it < effects.end();)
     {
+        takeDamage((*it).getDamagePerTurn());
         (*it).tick();
 
         if ((*it).isExpired() || attemptRemoveEffect(*it))
@@ -212,7 +216,6 @@ void Character::processEffects()
         }
         else
         {
-            takeDamage((*it).getDamagePerTurn());
             ++it;
         }
     }
