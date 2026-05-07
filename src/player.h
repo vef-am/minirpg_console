@@ -5,7 +5,7 @@
 #include <string>
 #endif
 
-#include "Character.h"
+#include "character.h"
 
 class Player : public Character
 {

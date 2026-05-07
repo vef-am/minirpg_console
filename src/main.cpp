@@ -1,7 +1,7 @@
 #include <iostream>
-#include "Character.h"
-#include "Enemy.h"
-#include "Player.h"
+#include "character.h"
+#include "enemy.h"
+#include "player.h"
 
 int main(){
     
