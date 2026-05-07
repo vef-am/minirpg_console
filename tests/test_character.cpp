@@ -215,6 +215,99 @@ namespace
 
         std::cout << "  cooldowns_and_immunity ok\n";
     }
+
+    void test_addeffect_same_duration_resets()
+    {
+        Character hero("ResetTest", Attributes(), 100, 100, 0, 10, 10);
+        
+        Effect poison1("Poison", 5, 3, true, 2);
+        hero.addEffect(poison1);
+        assert(hero.getEffects()[0].getDuration() == 5);
+        assert(hero.getEffects()[0].getMaxDuration() == 5);
+        
+        Effect poison2("Poison", 5, 9, true, 10);
+        hero.addEffect(poison2);
+        assert(hero.getEffects().size() == 1);
+        assert(hero.getEffects()[0].getDuration() == 5);
+        assert(hero.getEffects()[0].getMaxDuration() == 5);
+        assert(hero.getEffects()[0].getPotency() == 3);
+
+        std::cout << "  addeffect_same_duration_resets ok\n";
+    }
+
+    void test_processeffects_multiple_simultaneous()
+    {
+        Character hero("MultiEffect", Attributes(), 100, 100, 0, 10, 10);
+        
+        Effect burn("Burn", 2, 1, false, 10);
+        Effect poison("Poison", 3, 1, true, 5);
+        hero.addEffect(burn);
+        hero.addEffect(poison);
+        assert(hero.getEffects().size() == 2);
+        
+        hero.processEffects();
+        assert(hero.getCurrentHp() == 85);
+        assert(hero.getEffects().size() == 2);
+        assert(hero.getEffects()[0].getDuration() == 1);
+        assert(hero.getEffects()[1].getDuration() == 2);
+        
+        hero.processEffects();
+        assert(hero.getCurrentHp() == 70);
+        assert(hero.getEffects().size() == 1);
+        assert(hero.getEffects()[0].getType() == "Poison");
+        assert(hero.getEffects()[0].getDuration() == 1);
+
+        std::cout << "  processeffects_multiple_simultaneous ok\n";
+    }
+
+    void test_reducecooldowns_multiple_isolation()
+    {
+        Character hero("MultiCooldown", Attributes(), 100, 100, 0, 10, 10);
+        
+        hero.setCooldown("Skill1", 2);
+        hero.setCooldown("Skill2", 1);
+        assert(!hero.canUseSkill("Skill1"));
+        assert(!hero.canUseSkill("Skill2"));
+        
+        hero.reduceCooldowns();
+        assert(!hero.canUseSkill("Skill1"));
+        assert(hero.canUseSkill("Skill2"));
+        
+        hero.reduceCooldowns();
+        assert(hero.canUseSkill("Skill1"));
+        assert(hero.canUseSkill("Skill2"));
+
+        std::cout << "  reducecooldowns_multiple_isolation ok\n";
+    }
+
+    void test_removeimmunity_nonexistent()
+    {
+        Character hero("ImmuneTest", Attributes(), 100, 100, 0, 10, 10);
+        
+        assert(!hero.isImmune("Sleep"));
+        hero.removeImmunity("Sleep");
+        assert(!hero.isImmune("Sleep"));
+        
+        hero.addImmunity("Sleep");
+        assert(hero.isImmune("Sleep"));
+        hero.removeImmunity("Sleep");
+        assert(!hero.isImmune("Sleep"));
+        hero.removeImmunity("Sleep");
+        assert(!hero.isImmune("Sleep"));
+
+        std::cout << "  removeimmunity_nonexistent ok\n";
+    }
+
+    void test_display_no_crash()
+    {
+        Character hero("DisplayTest", Attributes(), 50, 100, 8, 20, 30);
+        hero.addEffect(Effect("Poison", 2, 1, true, 3));
+        hero.setCooldown("Defense", 1);
+        
+        hero.display();
+
+        std::cout << "  display_no_crash ok\n";
+    }
 } // namespace
 
 int main()
@@ -229,6 +322,11 @@ int main()
     test_effect_lifecycle_and_reapplication();
     test_process_effects();
     test_cooldowns_and_immunity();
+    test_addeffect_same_duration_resets();
+    test_processeffects_multiple_simultaneous();
+    test_reducecooldowns_multiple_isolation();
+    test_removeimmunity_nonexistent();
+    test_display_no_crash();
 
     std::cout << "All Character tests passed\n";
     return 0;

@@ -282,21 +282,26 @@ void Character::display()
     std::cout << std::string(20, '=') << "\n"
               << " NAME: " << name << "\n"
               << std::string(20, '=') << "\n"
-              << " HP: " << currentHp << '/' << maxHp << "\t|\t"
-              << " SP: " << currentSp << '/' << maxSp << "\t|\t"
+              << " HP: " << currentHp << '/' << maxHp << "  | "
+              << " SP: " << currentSp << '/' << maxSp << "  | "
               << " Armor: " << armor << "\n\n";
 
     // Attributes part
     std::cout << "ATTRIBUTES:" << "\n"
-              << "\tStrength\t\t: " << attributes.strength << "\tAgility\t\t: " << attributes.agility
-              << "\tConstitution\t: " << attributes.constitution << "\tIntelligence\t: " << attributes.intelligence
-              << "\tWisdom\t\t: " << attributes.wisdom << "\tCharisma\t\t: " << attributes.charisma << "\n\n";
+              << "\tStrength\t: " << attributes.strength << "\tAgility\t\t: " << attributes.agility << "\n"
+              << "\tConstitution\t: " << attributes.constitution << "\tIntelligence\t: " << attributes.intelligence << "\n"
+              << "\tWisdom\t\t: " << attributes.wisdom << "\tCharisma\t: " << attributes.charisma << "\n\n";
 
     // Effects part
     std::cout << "EFFECTS (active):" << "\n";
     for (const auto &effect : effects)
     {
-        std::cout << "\t- " << effect.getType() << " (" << effect.getDuration() << ')';
+        int duration = effect.getDuration();
+        std::cout << "\t- " << effect.getType() << " (" << duration;
+        if (duration > 1)
+            std::cout << " turns)";
+        else
+            std::cout << " turn)";
         if (effect.getDamagePerTurn() > 0)
         {
             std::cout << " - damage: " << effect.getDamagePerTurn() << "/turn";
