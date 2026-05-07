@@ -279,9 +279,9 @@ bool Character::isImmune(const std::string &effectType) const
 void Character::display()
 {
     // Upper part
-    std::cout << std::string(20, '=') << "\n"
+    std::cout << std::string(60, '=') << "\n"
               << " NAME: " << name << "\n"
-              << std::string(20, '=') << "\n"
+              << std::string(60, '=') << "\n"
               << " HP: " << currentHp << '/' << maxHp << "  | "
               << " SP: " << currentSp << '/' << maxSp << "  | "
               << " Armor: " << armor << "\n\n";
@@ -317,7 +317,7 @@ void Character::display()
     }
 
     // End
-    std::cout << std::string(20, '=') << "\n";
+    std::cout << std::string(60, '=') << "\n";
 }
 
 // Destructors
